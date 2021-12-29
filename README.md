@@ -7,4 +7,5 @@ The LEDkletty is compatible with the standard ergobag Kletties areas. You can st
 # The components
 For this project I used (so far): 
 * adafruit [GEMMA M0](https://www.adafruit.com/product/3501) board
-* adafruit [NeoPixel 24 Ring RGBW](https://www.adafruit.com/product/2863) 
+* adafruit [NeoPixel 24 Ring RGBW](https://www.adafruit.com/product/2863)
+* shock sensor SW-18020P to detect motion
