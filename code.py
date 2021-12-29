@@ -2,12 +2,28 @@
 import time
 import board
 import neopixel
+import digitalio
+import random
 
 pixel_pin = board.A1
 num_pixels = 24
 
+# vibration sensor
+motion_pin = board.D0  # Pin where vibration switch is connected
+pin = digitalio.DigitalInOut(motion_pin)
+pin.direction = digitalio.Direction.INPUT
+pin.pull = digitalio.Pull.UP
+vibration = False
+
+
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.1, auto_write=False,
                            pixel_order=(1, 0, 2, 3))
+
+
+def vibration_detector():
+    while True:
+        if not pin.value:
+            return True
 
 
 def colorwheel(pos):
@@ -22,6 +38,15 @@ def colorwheel(pos):
         return (0, 255 - pos * 3, pos * 3, 0)
     pos -= 170
     return (pos * 3, 0, 255 - pos * 3, 0)
+
+def blinker():
+    for i in range(5):
+        pixels[0] = (0, 255, 255, 0)
+        pixels.show()
+        time.sleep(0.6)
+        pixels[0] = (180, 0, 255, 0)
+        pixels.show()
+        time.sleep(0.6)
 
 
 def color_chase(color, wait):
@@ -39,7 +64,7 @@ def rainbow_cycle(wait):
             pixels[i] = colorwheel(rc_index & 255)
         pixels.show()
         time.sleep(wait)
-
+        ramping_up = False
 
 RED = (255, 0, 0, 0)
 YELLOW = (255, 150, 0, 0)
@@ -47,24 +72,23 @@ GREEN = (0, 255, 0, 0)
 CYAN = (0, 255, 255, 0)
 BLUE = (0, 0, 255, 0)
 PURPLE = (180, 0, 255, 0)
+BLACK = (0, 0, 0, 0)
 
 while True:
-    pixels.fill(RED)
-    pixels.show()
-    # Increase or decrease to change the speed of the solid color change.
-    time.sleep(1)
-    pixels.fill(GREEN)
-    pixels.show()
-    time.sleep(1)
-    pixels.fill(BLUE)
-    pixels.show()
-    time.sleep(1)
 
-    color_chase(RED, 0.1)  # Increase the number to slow down the color chase
-    color_chase(YELLOW, 0.1)
-    color_chase(GREEN, 0.1)
-    color_chase(CYAN, 0.1)
-    color_chase(BLUE, 0.1)
-    color_chase(PURPLE, 0.1)
+    if vibration_detector():
+        rancase = random.randint(1, 4)
 
-    rainbow_cycle(0)  # Increase the number to slow down the rainbow
+        if rancase == 1:
+            color_chase(GREEN,0.1)
+            color_chase(BLACK,0.1)
+        elif rancase == 2:
+            color_chase(PURPLE,0.1)
+            color_chase(BLACK,0.1)
+        elif rancase == 3:
+            rainbow_cycle(0)
+            color_chase(BLACK,0.1)
+        elif rancase == 4:
+            blinker()
+            color_chase(BLACK,0.1)
+
